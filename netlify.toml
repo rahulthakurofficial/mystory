@@ -1,7 +1,7 @@
 [build]
-  base = "frontend"  # Set the base directory if your frontend is in a subfolder
-  command ="npm install && npm run build"
-  publish = "dist"  #  Corrected path
+  base = "frontend"
+  command = "npm install && npm run build"
+  publish = "build" 
 
 [[redirects]]
   from = "/*"
