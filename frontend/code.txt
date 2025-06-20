@@ -1,0 +1,642 @@
+import React, { useState, useEffect } from "react";
+import './Dashboard.css';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { Eye, Edit, Trash2, Plus, X, Building2 } from "lucide-react";
+
+const Dashboard = () => {
+  const [stats, setStats] = useState({
+    totalStories: 0,
+    approvedStories: 0,
+    totalUsers: 0,
+    totalCategories: 0,
+    activeDeals: 0,
+    totalCompanies: 0
+  });
+  const [chartData, setChartData] = useState([]);
+  const [stories, setStories] = useState([]);
+  const [deals, setDeals] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [companies, setCompanies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [showDealModal, setShowDealModal] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+  const [newDeal, setNewDeal] = useState({ title: "", description: "", expiry: "", discount: "" });
+  const [selectedStory, setSelectedStory] = useState(null);
+  const [selectedCompany, setSelectedCompany] = useState(null);
+
+  // Mock data - replace with actual API calls
+  const mockData = {
+    stats: {
+      totalStories: 145,
+      approvedStories: 98,
+      totalUsers: 234,
+      totalCategories: 12,
+      activeDeals: 8,
+      totalCompanies: 15
+    },
+    chartData: [
+      { name: 'Jan', submissions: 20 },
+      { name: 'Feb', submissions: 35 },
+      { name: 'Mar', submissions: 28 },
+      { name: 'Apr', submissions: 42 },
+      { name: 'May', submissions: 38 },
+      { name: 'Jun', submissions: 55 },
+    ],
+    stories: [
+      { id: 1, title: "Amazing Customer Service Experience", author: "John Doe", status: "pending", content: "Lorem ipsum dolor sit amet..." },
+      { id: 2, title: "Quick Delivery Story", author: "Jane Smith", status: "approved", content: "Consectetur adipiscing elit..." },
+      { id: 3, title: "Product Quality Review", author: "Mike Johnson", status: "pending", content: "Sed do eiusmod tempor incididunt..." },
+      { id: 4, title: "Great Support Team", author: "Sarah Wilson", status: "rejected", content: "Ut labore et dolore magna..." },
+      { id: 5, title: "Smooth Shopping Experience", author: "Tom Brown", status: "approved", content: "Aliqua enim ad minim veniam..." }
+    ],
+    deals: [
+      { id: 1, deal: "Summer Sale - 50% Off", expiry: "2024-08-31", discount: "50%", description: "Get 50% off on all summer items" },
+      { id: 2, deal: "Electronics Deal", expiry: "2024-07-15", discount: "30%", description: "30% discount on electronics" },
+      { id: 3, deal: "Fashion Week Special", expiry: "2024-09-10", discount: "40%", description: "Fashion items at 40% off" },
+      { id: 4, deal: "Back to School", expiry: "2024-08-20", discount: "25%", description: "School supplies discount" }
+    ],
+    users: [
+      { id: 1, name: "Rahul kumar", email: "rahulthakur.2314@gmail.com", phone: "+1-555-0101", joinDate: "2024-01-15" },
+      { id: 2, name: "Rahul kumar", email: "rahulthakur.2314@gmail.com", phone: "+1-555-0102", joinDate: "2024-02-20" },
+      { id: 3, name: "Rahul kumar", email: "rahulthakur.2314@gmail.com", phone: "+1-555-0103", joinDate: "2024-03-10" },
+      { id: 4, name: "Rahul kumar", email: "rahulthakur.2314@gmail.com", phone: "+1-555-0104", joinDate: "2024-04-05" },
+      { id: 5, name: "Rahul kumar", email: "rahulthakur.2314@gmail.com", phone: "+1-555-0105", joinDate: "2024-05-12" }
+    ],
+    categories: [
+      { id: 1, name: "Customer Service", count: 45 },
+      { id: 2, name: "Product Quality", count: 32 },
+      { id: 3, name: "Delivery", count: 28 },
+      { id: 4, name: "Technical Support", count: 19 },
+      { id: 5, name: "Billing", count: 15 },
+      { id: 6, name: "Returns", count: 12 }
+    ],
+    companies: [
+      { 
+        id: 1, 
+        companyName: "TechCorp Solutions", 
+        tagline: "Innovation at its best", 
+        categories: ["Tech", "Sales"], 
+        deals: "20% off first month",
+        submittedAt: "2024-05-20",
+        status: "active"
+      },
+      { 
+        id: 2, 
+        companyName: "Global Marketing Inc", 
+        tagline: "Your success is our mission", 
+        categories: ["Marketing", "Sales"], 
+        deals: "Free consultation",
+        submittedAt: "2024-05-18",
+        status: "pending"
+      }
+    ]
+  };
+
+  // Load data on component mount
+  useEffect(() => {
+    const loadData = () => {
+      setTimeout(() => {
+        setStats(mockData.stats);
+        setChartData(mockData.chartData);
+        setStories(mockData.stories);
+        setDeals(mockData.deals);
+        setUsers(mockData.users);
+        setCategories(mockData.categories);
+        setCompanies(mockData.companies);
+        setLoading(false);
+      }, 1000);
+    };
+    loadData();
+  }, []);
+
+  // Function to add new company (called when form is submitted)
+  const addCompany = (companyData) => {
+    const newCompany = {
+      id: companies.length + 1,
+      ...companyData,
+      submittedAt: new Date().toISOString().split('T')[0],
+      status: 'pending'
+    };
+    setCompanies(prev => [newCompany, ...prev]);
+    setStats(prev => ({ ...prev, totalCompanies: prev.totalCompanies + 1 }));
+  };
+
+  // Make addCompany available globally so CompanyForm can use it
+  useEffect(() => {
+    window.addCompanyToDashboard = addCompany;
+    return () => {
+      delete window.addCompanyToDashboard;
+    };
+  }, [companies]);
+
+  const handleApprove = async (id) => {
+    try {
+      setStories(stories.map(story => 
+        story.id === id ? { ...story, status: 'approved' } : story
+      ));
+      setStats(prev => ({ ...prev, approvedStories: prev.approvedStories + 1 }));
+      alert('Story approved successfully!');
+    } catch (error) {
+      console.error('Error approving story:', error);
+      alert('Error approving story');
+    }
+  };
+
+  const handleReject = async (id) => {
+    try {
+      setStories(stories.map(story => 
+        story.id === id ? { ...story, status: 'rejected' } : story
+      ));
+      alert('Story rejected successfully!');
+    } catch (error) {
+      console.error('Error rejecting story:', error);
+      alert('Error rejecting story');
+    }
+  };
+
+  const handleCompanyStatusChange = (id, newStatus) => {
+    setCompanies(companies.map(company => 
+      company.id === id ? { ...company, status: newStatus } : company
+    ));
+    alert(`Company ${newStatus} successfully!`);
+  };
+
+  const deleteCompany = (id) => {
+    setCompanies(companies.filter(company => company.id !== id));
+    setStats(prev => ({ ...prev, totalCompanies: prev.totalCompanies - 1 }));
+  };
+
+  const addCategory = () => {
+    if (newCategory.trim()) {
+      const newCat = {
+        id: categories.length + 1,
+        name: newCategory,
+        count: 0
+      };
+      setCategories([...categories, newCat]);
+      setStats(prev => ({ ...prev, totalCategories: prev.totalCategories + 1 }));
+      setNewCategory("");
+      setShowCategoryModal(false);
+    }
+  };
+
+  const deleteCategory = (id) => {
+    setCategories(categories.filter(cat => cat.id !== id));
+    setStats(prev => ({ ...prev, totalCategories: prev.totalCategories - 1 }));
+  };
+
+  const addDeal = () => {
+    if (newDeal.title.trim() && newDeal.expiry) {
+      const deal = {
+        id: deals.length + 1,
+        deal: newDeal.title,
+        expiry: newDeal.expiry,
+        discount: newDeal.discount,
+        description: newDeal.description
+      };
+      setDeals([...deals, deal]);
+      setStats(prev => ({ ...prev, activeDeals: prev.activeDeals + 1 }));
+      setNewDeal({ title: "", description: "", expiry: "", discount: "" });
+      setShowDealModal(false);
+    }
+  };
+
+  const deleteDeal = (id) => {
+    setDeals(deals.filter(deal => deal.id !== id));
+    setStats(prev => ({ ...prev, activeDeals: prev.activeDeals - 1 }));
+  };
+
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-content">
+          <div className="loading-spinner"></div>
+          <div className="loading-text">Loading dashboard...</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="dashboard">
+      <div className="dashboard-container">
+        <div className="dashboard-header">
+          <h2 className="dashboard-title">Admin Dashboard</h2>
+          <div className="dashboard-date">
+            Last updated: {new Date().toLocaleDateString()}
+          </div>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="stats-grid">
+          <div className="stat-card stat-card-blue">
+            <h3 className="stat-title">Total Stories</h3>
+            <p className="stat-number">{stats.totalStories}</p>
+            <div className="stat-subtitle">Submitted</div>
+          </div>
+          <div className="stat-card stat-card-green">
+            <h3 className="stat-title">Approved</h3>
+            <p className="stat-number">{stats.approvedStories}</p>
+            <div className="stat-subtitle">
+              {Math.round((stats.approvedStories / stats.totalStories) * 100)}% rate
+            </div>
+          </div>
+          <div className="stat-card stat-card-purple">
+            <h3 className="stat-title">Total Users</h3>
+            <p className="stat-number">{stats.totalUsers}</p>
+            <div className="stat-subtitle">Registered</div>
+          </div>
+          <div className="stat-card stat-card-orange">
+            <h3 className="stat-title">Categories</h3>
+            <p className="stat-number">{stats.totalCategories}</p>
+            <div className="stat-subtitle">Active</div>
+          </div>
+          <div className="stat-card stat-card-red">
+            <h3 className="stat-title">Active Deals</h3>
+            <p className="stat-number">{stats.activeDeals}</p>
+            <div className="stat-subtitle">Running</div>
+          </div>
+        </div>
+
+        {/* Chart */}
+        <div className="chart-container">
+          <h3 className="section-title">Submissions Over Time</h3>
+          <div className="chart-wrapper">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="submissions"
+                  stroke="#3B82F6"
+                  strokeWidth={3}
+                  dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="main-grid">
+          {/* Submitted Stories */}
+          <div className="content-card">
+            <h3 className="section-title">Recent Stories</h3>
+            <div className="table-container">
+              <table className="data-table">
+                <thead>
+                  <tr className="table-header">
+                    <th className="table-cell">Title</th>
+                    <th className="table-cell">Author</th>
+                    <th className="table-cell">Status</th>
+                    <th className="table-cell">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stories.slice(0, 6).map((story) => (
+                    <tr key={story.id} className="table-row">
+                      <td className="table-cell">
+                        <div className="story-title">{story.title}</div>
+                      </td>
+                      <td className="table-cell story-author">{story.author}</td>
+                      <td className="table-cell">
+                        <span className={`status-badge status-${story.status}`}>
+                          {story.status.charAt(0).toUpperCase() + story.status.slice(1)}
+                        </span>
+                      </td>
+                      <td className="table-cell">
+                        <div className="action-buttons">
+                          <button
+                            onClick={() => setSelectedStory(story)}
+                            className="action-btn view-btn"
+                            title="View"
+                          >
+                            <Eye size={16} />
+                          </button>
+                          {story.status === 'pending' && (
+                            <>
+                              <button
+                                onClick={() => handleApprove(story.id)}
+                                className="action-btn approve-btn"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => handleReject(story.id)}
+                                className="action-btn reject-btn"
+                              >
+                                Reject
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Categories */}
+          <div className="content-card">
+            <div className="section-header">
+              <h3 className="section-title">Categories</h3>
+              <button 
+                onClick={() => setShowCategoryModal(true)}
+                className="add-btn"
+              >
+                <Plus size={16} />
+                <span>Add New</span>
+              </button>
+            </div>
+            <div className="categories-list">
+              {categories.map((category) => (
+                <div key={category.id} className="category-item">
+                  <div className="category-content">
+                    <span className="category-name">{category.name}</span>
+                    <div className="category-actions">
+                      <span className="category-count">
+                        {category.count} stories
+                      </span>
+                      <button
+                        onClick={() => deleteCategory(category.id)}
+                        className="delete-btn"
+                        title="Delete category"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Section */}
+        <div className="bottom-grid">
+          {/* Deals & Discounts */}
+          <div className="content-card">
+            <div className="section-header">
+              <h3 className="section-title">Active Deals</h3>
+              <button 
+                onClick={() => setShowDealModal(true)}
+                className="add-btn"
+              >
+                <Plus size={16} />
+                <span>Add Deal</span>
+              </button>
+            </div>
+            <div className="table-container">
+              <table className="data-table">
+                <thead>
+                  <tr className="table-header">
+                    <th className="table-cell">Deal</th>
+                    <th className="table-cell">Discount</th>
+                    <th className="table-cell">Expiry</th>
+                    <th className="table-cell">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {deals.map((deal) => (
+                    <tr key={deal.id} className="table-row">
+                      <td className="table-cell">
+                        <div>
+                          <div className="deal-title">{deal.deal}</div>
+                          <div className="deal-description">{deal.description}</div>
+                        </div>
+                      </td>
+                      <td className="table-cell">
+                        <span className="discount-badge">
+                          {deal.discount}
+                        </span>
+                      </td>
+                      <td className="table-cell deal-expiry">{deal.expiry}</td>
+                      <td className="table-cell">
+                        <div className="action-buttons">
+                          <button className="action-btn edit-btn">
+                            <Edit size={14} />
+                          </button>
+                          <button
+                            onClick={() => deleteDeal(deal.id)}
+                            className="action-btn delete-btn"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Customer Details */}
+          <div className="content-card">
+            <h3 className="section-title">Recent Users</h3>
+            <div className="table-container">
+              <table className="data-table">
+                <thead>
+                  <tr className="table-header">
+                    <th className="table-cell">Name</th>
+                    <th className="table-cell">Email</th>
+                    <th className="table-cell">Joined</th>
+                    <th className="table-cell">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((user) => (
+                    <tr key={user.id} className="table-row">
+                      <td className="table-cell user-name">{user.name}</td>
+                      <td className="table-cell user-email">{user.email}</td>
+                      <td className="table-cell user-date">{user.joinDate}</td>
+                      <td className="table-cell">
+                        <button className="view-profile-btn">
+                          View Profile
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Category Modal */}
+      {showCategoryModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h3 className="modal-title">Add New Category</h3>
+              <button
+                onClick={() => setShowCategoryModal(false)}
+                className="modal-close"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <input
+              type="text"
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              placeholder="Category name"
+              className="modal-input"
+            />
+            <div className="modal-actions">
+              <button
+                onClick={addCategory}
+                className="modal-btn modal-btn-primary"
+              >
+                Add Category
+              </button>
+              <button
+                onClick={() => setShowCategoryModal(false)}
+                className="modal-btn modal-btn-secondary"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Deal Modal */}
+      {showDealModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h3 className="modal-title">Add New Deal</h3>
+              <button
+                onClick={() => setShowDealModal(false)}
+                className="modal-close"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="modal-form">
+              <input
+                type="text"
+                value={newDeal.title}
+                onChange={(e) => setNewDeal({...newDeal, title: e.target.value})}
+                placeholder="Deal title"
+                className="modal-input"
+              />
+              <input
+                type="text"
+                value={newDeal.description}
+                onChange={(e) => setNewDeal({...newDeal, description: e.target.value})}
+                placeholder="Description"
+                className="modal-input"
+              />
+              <input
+                type="date"
+                value={newDeal.expiry}
+                onChange={(e) => setNewDeal({...newDeal, expiry: e.target.value})}
+                className="modal-input"
+              />
+              <input
+                type="text"
+                value={newDeal.discount}
+                onChange={(e) => setNewDeal({...newDeal, discount: e.target.value})}
+                placeholder="Discount (e.g., 25%)"
+                className="modal-input"
+              />
+            </div>
+            <div className="modal-actions">
+              <button
+                onClick={addDeal}
+                className="modal-btn modal-btn-primary"
+              >
+                Add Deal
+              </button>
+              <button
+                onClick={() => setShowDealModal(false)}
+                className="modal-btn modal-btn-secondary"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Story View Modal */}
+      {selectedStory && (
+        <div className="modal-overlay">
+          <div className="modal modal-large">
+            <div className="modal-header">
+              <h3 className="modal-title">Story Details</h3>
+              <button
+                onClick={() => setSelectedStory(null)}
+                className="modal-close"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="story-details">
+              <div className="story-field">
+                <label className="story-label">Title</label>
+                <p className="story-value">{selectedStory.title}</p>
+              </div>
+              <div className="story-field">
+                <label className="story-label">Author</label>
+                <p className="story-value">{selectedStory.author}</p>
+              </div>
+              <div className="story-field">
+                <label className="story-label">Status</label>
+                <span className={`status-badge status-${selectedStory.status}`}>
+                  {selectedStory.status.charAt(0).toUpperCase() + selectedStory.status.slice(1)}
+                </span>
+              </div>
+              <div className="story-field">
+                <label className="story-label">Content</label>
+                <p className="story-content">{selectedStory.content}</p>
+              </div>
+            </div>
+            {selectedStory.status === 'pending' && (
+              <div className="modal-actions">
+                <button
+                  onClick={() => {
+                    handleApprove(selectedStory.id);
+                    setSelectedStory(null);
+                  }}
+                  className="modal-btn modal-btn-success"
+                >
+                  Approve
+                </button>
+                <button
+                  onClick={() => {
+                    handleReject(selectedStory.id);
+                    setSelectedStory(null);
+                  }}
+                  className="modal-btn modal-btn-danger"
+                >
+                  Reject
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Dashboard;

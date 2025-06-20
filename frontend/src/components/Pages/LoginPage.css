@@ -1,0 +1,112 @@
+
+.auth-container {
+  display: flex;
+  background: linear-gradient(to right, #f2f9ff, #e8f0ff);
+  font-family: 'Segoe UI', sans-serif;
+  margin-top: 10px;
+  margin-left: 100px;
+  margin-right: 100px;
+}
+
+.auth-box {
+  flex: 1;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 400px;
+  background-color: white;
+}
+
+.auth-box h2 {
+  margin-bottom: 30px;
+  color: #333;
+  font-weight: 500;
+}
+
+form input {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.auth-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 60px;
+  font-size: 14px;
+}
+
+.auth-options a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.login-btn,
+.signup-btn {
+  flex: 1;
+  padding: 12px 0;
+  font-size: 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.login-btn {
+  background-color: #4facfe;
+  color: white;
+}
+
+.signup-btn {
+  background-color: white;
+  color: #4facfe;
+  border: 2px solid #4facfe;
+}
+
+.signup-btn:hover {
+  background-color: #4facfe;
+  color: white;
+}
+
+.terms {
+  font-size: 12px;
+  color: #666;
+}
+
+.terms a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.auth-image {
+  flex: 1;
+ 
+  background-size: cover;
+  border-top-left-radius: 50px;
+  border-bottom-left-radius: 50px;
+}
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1;
+}
+
+.checkbox-input {
+  vertical-align: middle;
+  margin: 0;
+  accent-color: #4facfe; /* Optional: style the checkbox */
+}
