@@ -127,7 +127,7 @@ const Home = () => {
             <span className="tag">#AI</span>
             <h3>Story Title</h3>
             <p>Story description goes here.</p>
-            <a href="#">Read More</a>
+            <a href="/about">Read More</a>
           </div>
           <div
             className="story-card"
@@ -141,7 +141,7 @@ const Home = () => {
             <span className="tag">Agriculture</span>
             <h3>Story Title</h3>
             <p>Story description goes here.</p>
-            <a href="#">Read More</a>
+            <a href="/about">Read More</a>
           </div>
           <div
             className="story-card"
@@ -155,7 +155,7 @@ const Home = () => {
             <span className="tag">Transportation</span>
             <h3>Story Title</h3>
             <p>Story description goes here.</p>
-            <a href="#">Read More</a>
+            <a href="/about">Read More</a>
           </div>
         </div>
       </section>

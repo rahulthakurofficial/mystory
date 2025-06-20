@@ -109,8 +109,8 @@ const SignupPage = () => {
           {message && <p className="signup-message">{message}</p>}
           <p className="terms">
             By signing up, you agree to our company’s{" "}
-            <a href="#">Terms and Conditions</a> and{" "}
-            <a href="#">Privacy Policy</a>
+            <a href="/about">Terms and Conditions</a> and{" "}
+            <a href="/about">Privacy Policy</a>
           </p>
         </form>
       </div>

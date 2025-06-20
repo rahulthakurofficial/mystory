@@ -74,7 +74,7 @@ const LoginPage = () => {
               <input type="checkbox" className="checkbox-input" />
               <span>Remember me</span>
             </label>
-            <a href="#">Forgot Password</a>
+            <a href="/about">Forgot Password</a>
           </div>
           <div className="auth-buttons">
             <button type="submit" className="login-btn">
@@ -87,8 +87,8 @@ const LoginPage = () => {
           {message && <p className="login-message">{message}</p>}
           <p className="terms">
             By signing up, you agree to our company’s{" "}
-            <a href="#">Terms and Conditions</a> and{" "}
-            <a href="#">Privacy Policy</a>
+            <a href="/about">Terms and Conditions</a> and{" "}
+            <a href="/about">Privacy Policy</a>
           </p>
         </form>
       </div>
