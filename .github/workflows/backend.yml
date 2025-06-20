@@ -1,0 +1,26 @@
+name: Deploy PHP Backend
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy via SFTP to Render/Host
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}  # or use `key` for SSH key
+          port: 22
+          source: "backend/"
+          target: "/var/www/html"  # adjust this path as per your hosting setup
